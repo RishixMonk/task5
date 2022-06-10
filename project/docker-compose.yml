@@ -2,6 +2,7 @@ version: "3"
 
 services:
   nginx:
+    container_name: myproxy
     build:
       context: .
       dockerfile: ./nginx.Dockerfile
@@ -9,16 +10,21 @@ services:
       - app1
       - app2
       - app3
+    volumes:
+      - html:/usr/share/nginx/html/
     ports:
       - "8080:80"
   db:
     image: postgres
     environment:
       POSTGRES_PASSWORD: postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data/
     ports:
       - "5432:5432"
 
   app1:
+    container_name: app1
     build:
       context: .
       dockerfile: app.Dockerfile
@@ -31,6 +37,7 @@ services:
       - db
     
   app2:
+    container_name: app2
     build:
       context: .
       dockerfile: app.Dockerfile
@@ -43,6 +50,7 @@ services:
       - db
 
   app3:
+    container_name: app3
     build:
       context: .
       dockerfile: app.Dockerfile
@@ -53,3 +61,9 @@ services:
       - "5003:3000"
     depends_on:
       - db
+      
+volumes:
+  db-data:
+    driver: local
+  html:
+    driver: local
